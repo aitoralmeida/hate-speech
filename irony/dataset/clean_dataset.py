@@ -10,6 +10,7 @@ import csv, json
 DATASET_IRONY= "irony-labeled.csv"
 DATASET_IRONY_CLEAN = "irony-labeled-clean.json"
 
+
 def clean_text(text):
     text = text.replace('.', '')
     text = text.replace(',', '')
@@ -33,10 +34,22 @@ def clean_text(text):
     text = text.replace('=', '')
     text = text.replace('$', '')
     text = text.replace('€', '')
+    text = text.replace('+', '')
+    text = text.replace('-', '')
+    text = text.replace('*', '')
+    text = text.replace('~', '')
+    text = text.replace('`', '') 
+    text = text.replace('|', '') 
     text = text.replace('\n', ' ')
     text = text.replace('\r', ' ')
-    text = text.replace('*', ' ')
+    text = text.replace('\t', ' ')
     text = text.replace('/', ' ')  
+    text = text.replace('=', ' ') 
+    text = text.replace('>', ' ') 
+    text = text.replace('<', ' ') 
+    text = text.replace('\\', ' ') 
+    text = text.replace('^', ' ') 
+    text = text.replace('_', ' ')     
     text = text.strip()
     return text
     
