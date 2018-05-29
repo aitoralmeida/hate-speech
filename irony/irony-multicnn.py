@@ -13,9 +13,10 @@ from gensim.models import KeyedVectors
 
 import h5py
 
-#from keras.callbacks import ModelCheckpoint
-#from keras.layers import Activation, Dot, Bidirectional, Concatenate, Convolution2D, Dense, Dropout, Embedding, Flatten, GRU, Input, MaxPooling2D, Multiply, Reshape, TimeDistributed
-#from keras.models import load_model, Model
+from keras.models import Sequential, model_from_json, Model
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.layers import Activation, Dense, Dropout, Embedding, LSTM, Bidirectional, Convolution1D, Convolution2D, MaxPooling2D, AveragePooling2D, GlobalMaxPooling1D,GlobalMaxPooling2D, Flatten, Concatenate, Input, Reshape, TimeDistributed, Multiply, GRU
+
 from keras.preprocessing.text import Tokenizer
 
 import matplotlib
@@ -206,11 +207,16 @@ if __name__ == "__main__":
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
     X, y, tokenizer = prepare_x_y(data, unique_words)  
+    
     print '*' * 20
     print 'Preparing embedding matrix...'
+    sys.stdout.flush()
     # Create the embedding matrix for the embedding layer initialization
     embedding_matrix = create_embedding_matrix(tokenizer)
     
+    print '*' * 20
+    print 'Preparing train and test datasets...'
+    sys.stdout.flush()
     #divide the examples in training and validation
     total_examples = len(X)
     test_per = 0.2
@@ -231,6 +237,37 @@ if __name__ == "__main__":
     print 'Shape (X,y):'
     print X_train.shape
     print y_train.shape
+    
+    print '*' * 20
+    print 'Building model...'
+    sys.stdout.flush()
+    #input pipeline
+    input_words = Input(shape=(INPUT_WORDS,), dtype='int32', name='input_words')
+    embedding_words = Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=INPUT_WORDS, trainable=True, name='embedding_words')(input_words)        
+    reshape = Reshape((INPUT_WORDS, WORD_EMBEDDING_LENGTH, 1), name = 'reshape')(embedding_words) 
+    #branching convolutions
+    ngram_2 = Convolution2D(200, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_2')(reshape)
+    maxpool_2 = MaxPooling2D(pool_size=(INPUT_WORDS-2+1,1), name = 'pooling_2')(ngram_2)
+    ngram_3 = Convolution2D(200, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_3')(reshape)
+    maxpool_3 = MaxPooling2D(pool_size=(INPUT_WORDS-3+1,1), name = 'pooling_3')(ngram_3)
+    ngram_4 = Convolution2D(200, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_4')(reshape)
+    maxpool_4 = MaxPooling2D(pool_size=(INPUT_WORDS-4+1,1), name = 'pooling_4')(ngram_4)
+    ngram_5 = Convolution2D(200, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
+    maxpool_5 = MaxPooling2D(pool_size=(INPUT_WORDS-5+1,1), name = 'pooling_5')(ngram_5)
+    #1 branch again
+    merged = Concatenate(axis=2)([maxpool_2, maxpool_3, maxpool_4, maxpool_5])
+    flatten = Flatten(name = 'flatten')(merged)
+#    batch_norm = BatchNormalization()(flatten)
+    dense_1 = Dense(256, activation = 'relu',name = 'dense_1')(flatten)
+    drop_1 = Dropout(0.8, name = 'drop_1')(dense_1)
+    dense_2 = Dense(256, activation = 'relu',name = 'dense_2')(drop_1)
+    drop_2 = Dropout(0.8, name = 'drop_2')(dense_2)
+    output_irony = Dense(2, activation='softmax', name='main_output')(drop_2)
+    model = Model(input=[input_words], output=[output_irony])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
+    print 'Model built'
+    print(model.summary())
+    sys.stdout.flush()
     
     print 'FIN'    
     
