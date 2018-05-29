@@ -159,6 +159,34 @@ def get_labels(data):
     for row in data:
         labels.append(row[1])
     return labels
+    
+"""
+Function to create the embedding matrix, which will be used to initialize
+the embedding layer of the network
+Input:
+    tokenizer: instance of Tokenizer class used for action/index convertion
+Output:
+    embedding_matrix: matrix with the embedding vectors for each word
+    
+"""
+def create_embedding_matrix(tokenizer):
+    model = Word2Vec.load(WORD2VEC_MODEL)    
+    word_index = tokenizer.word_index
+    embedding_matrix = np.zeros((len(word_index) + 1, WORD_EMBEDDING_LENGTH))
+    unknown_words = {}    
+    for word, i in word_index.items():
+        try:            
+            embedding_vector = model[word]
+            embedding_matrix[i] = embedding_vector            
+        except:
+            if word in unknown_words:
+                unknown_words[word] += 1
+            else:
+                unknown_words[word] = 1
+    print "Number of unknown tokens: " + str(len(unknown_words))
+    print unknown_words
+    
+    return embedding_matrix
 
     
 if __name__ == "__main__":
@@ -177,6 +205,10 @@ if __name__ == "__main__":
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
     X, y, tokenizer = prepare_x_y(data, unique_words)  
+    print '*' * 20
+    print 'Preparing embedding matrix...'
+    # Create the embedding matrix for the embedding layer initialization
+    embedding_matrix = create_embedding_matrix(tokenizer)
     
     #divide the examples in training and validation
     total_examples = len(X)
