@@ -21,6 +21,8 @@ def clean_text(text):
     text = text.replace('¡', '')
     text = text.replace('!', '')
     text = text.replace('"', '')
+    text = text.replace('"', '')
+    text = text.replace('--', ' ')
     text = text.replace('#', '')
     text = text.replace('@', '')
     text = text.replace('%', '')
@@ -40,6 +42,7 @@ def clean_text(text):
     text = text.replace('~', '')
     text = text.replace('`', '') 
     text = text.replace('|', '') 
+    text = text.replace('--', ' ')
     text = text.replace('\n', ' ')
     text = text.replace('\r', ' ')
     text = text.replace('\t', ' ')
@@ -51,6 +54,7 @@ def clean_text(text):
     text = text.replace('^', ' ') 
     text = text.replace('_', ' ')     
     text = text.strip()
+    text = text.lower()
     return text
     
 if __name__ == "__main__":
