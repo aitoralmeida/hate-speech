@@ -9,6 +9,7 @@ import json
 import sys
 
 from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
 
 import h5py
 
@@ -170,13 +171,14 @@ Output:
     
 """
 def create_embedding_matrix(tokenizer):
-    model = Word2Vec.load(WORD2VEC_MODEL)    
+#    model = Word2Vec.load(WORD2VEC_MODEL) 
+    word_vectors = KeyedVectors.load_word2vec_format(WORD2VEC_MODEL, binary=True)   
     word_index = tokenizer.word_index
     embedding_matrix = np.zeros((len(word_index) + 1, WORD_EMBEDDING_LENGTH))
     unknown_words = {}    
     for word, i in word_index.items():
         try:            
-            embedding_vector = model[word]
+            embedding_vector = word_vectors[word]
             embedding_matrix[i] = embedding_vector            
         except:
             if word in unknown_words:
@@ -184,8 +186,7 @@ def create_embedding_matrix(tokenizer):
             else:
                 unknown_words[word] = 1
     print "Number of unknown tokens: " + str(len(unknown_words))
-    print unknown_words
-    
+   
     return embedding_matrix
 
     
