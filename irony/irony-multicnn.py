@@ -31,11 +31,17 @@ from unidecode import unidecode
 DATASET_JSON = "./dataset/irony-labeled-clean.json"
 WORD2VEC_MODEL = "./../english_embedding/GoogleNews-vectors-negative300.bin"
 UNIQUE_WORDS = "./../english_embedding/unique_words.json"
+# ID for the experiment which is being run -> used to store the files with
+# appropriate naming
+EXPERIMENT_ID = '01'
+# File name for best model weights storage
+WEIGHTS_FILE = EXPERIMENT_ID + '_cnn_parallel_withattention_notime.hdf5'
 
 #number of input words for the model
 INPUT_WORDS = 798
 #Number of elements in the words's embbeding vector
 WORD_EMBEDDING_LENGTH = 300
+BATCH_SIZE = 1024
 
 #best model in the training
 BEST_MODEL = 'best_model.hdf5'
@@ -222,18 +228,18 @@ if __name__ == "__main__":
     test_per = 0.2
     limit = int(test_per * total_examples)
     X_train = X[limit:]
-    X_test = X[:limit]
+    X_val = X[:limit]
     y_train = y[limit:]
-    y_test = y[:limit]
+    y_val = y[:limit]
     print 'Different words:', total_words
     print 'Total examples:', total_examples
     print 'Train examples:', len(X_train), len(y_train) 
-    print 'Test examples:', len(X_test), len(y_test)
+    print 'Test examples:', len(X_val), len(y_val)
     sys.stdout.flush()  
     X_train = np.array(X_train)
     y_train = np.array(y_train)
-    X_test = np.array(X_test)
-    y_test = np.array(y_test)
+    X_val = np.array(X_val)
+    y_val = np.array(y_val)
     print 'Shape (X,y):'
     print X_train.shape
     print y_train.shape
@@ -268,6 +274,19 @@ if __name__ == "__main__":
     print 'Model built'
     print(model.summary())
     sys.stdout.flush()
+    
+    print '*' * 20
+    print 'Training...'
+    sys.stdout.flush()
+    # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
+    earlystopping = EarlyStopping(monitor='val_loss', patience=100, verbose=0)    
+    modelcheckpoint = ModelCheckpoint(WEIGHTS_FILE, monitor='val_loss', save_best_only=True, verbose=0)
+    callbacks = [earlystopping, modelcheckpoint]
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=True, callbacks=callbacks)
+    # Print best val_acc and val_loss
+    print 'Validation accuracy:', max(history.history['val_acc'])
+    print 'Validation loss:', min(history.history['val_loss'])
+    plot_training_info(['accuracy', 'loss'], True, history.history)    
     
     print 'FIN'    
     
