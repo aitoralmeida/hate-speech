@@ -33,7 +33,7 @@ WORD2VEC_MODEL = "./../english_embedding/GoogleNews-vectors-negative300.bin"
 UNIQUE_WORDS = "./../english_embedding/unique_words.json"
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '01'
+EXPERIMENT_ID = '07'
 # File name for best model weights storage
 WEIGHTS_FILE = EXPERIMENT_ID + '_cnn_parallel_withattention_notime.hdf5'
 
@@ -71,7 +71,7 @@ def plot_training_info(metrics, save, history):
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         if save == True:
-            plt.savefig('accuracy.png')
+            plt.savefig(EXPERIMENT_ID+'_accuracy.png')
             plt.gcf().clear()
         else:
             plt.show()
@@ -87,7 +87,7 @@ def plot_training_info(metrics, save, history):
         plt.yscale("log")
         plt.legend(['train', 'test'], loc='upper left')
         if save == True:
-            plt.savefig('loss.png')
+            plt.savefig(EXPERIMENT_ID+'_loss.png')
             plt.gcf().clear()
         else:
             plt.show()
@@ -260,13 +260,13 @@ if __name__ == "__main__":
     embedding_words = Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=INPUT_WORDS, trainable=True, name='embedding_words')(input_words)        
     reshape = Reshape((INPUT_WORDS, WORD_EMBEDDING_LENGTH, 1), name = 'reshape')(embedding_words) 
     #branching convolutions
-    ngram_2 = Convolution2D(200, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_2')(reshape)
+    ngram_2 = Convolution2D(100, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_2')(reshape)
     maxpool_2 = MaxPooling2D(pool_size=(INPUT_WORDS-2+1,1), name = 'pooling_2')(ngram_2)
-    ngram_3 = Convolution2D(200, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_3')(reshape)
+    ngram_3 = Convolution2D(100, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_3')(reshape)
     maxpool_3 = MaxPooling2D(pool_size=(INPUT_WORDS-3+1,1), name = 'pooling_3')(ngram_3)
-    ngram_4 = Convolution2D(200, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_4')(reshape)
+    ngram_4 = Convolution2D(100, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_4')(reshape)
     maxpool_4 = MaxPooling2D(pool_size=(INPUT_WORDS-4+1,1), name = 'pooling_4')(ngram_4)
-    ngram_5 = Convolution2D(200, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
+    ngram_5 = Convolution2D(100, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
     maxpool_5 = MaxPooling2D(pool_size=(INPUT_WORDS-5+1,1), name = 'pooling_5')(ngram_5)
     #1 branch again
     merged = Concatenate(axis=2)([maxpool_2, maxpool_3, maxpool_4, maxpool_5])
