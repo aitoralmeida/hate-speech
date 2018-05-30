@@ -24,7 +24,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import numpy as np
-
+from sklearn.model_selection import train_test_split
 from unidecode import unidecode
 
 
@@ -227,10 +227,18 @@ if __name__ == "__main__":
     total_examples = len(X)
     test_per = 0.2
     limit = int(test_per * total_examples)
-    X_train = X[limit:]
-    X_val = X[:limit]
-    y_train = y[limit:]
-    y_val = y[:limit]
+    
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)  
+    
+        
+    
+    
+    
+    
+#    X_train = X[limit:]
+#    X_val = X[:limit]
+#    y_train = y[limit:]
+#    y_val = y[:limit]
     print 'Different words:', total_words
     print 'Total examples:', total_examples
     print 'Train examples:', len(X_train), len(y_train) 
