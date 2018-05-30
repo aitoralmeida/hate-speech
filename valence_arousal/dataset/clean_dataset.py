@@ -66,9 +66,11 @@ if __name__ == "__main__":
             valence1 = float(tokens[-1])
             valence2 = float(tokens[-2])
             valence = (valence1 + valence2) / 2.0
+            valence = valence / 10.0
             arousal1 = float(tokens[-3])
             arousal2 = float(tokens[-4])
             arousal = (arousal1 + arousal2) / 2.0
+            arousal = arousal / 10.0
             if len(tokens) > 5:
                 print line
                 text = ''
