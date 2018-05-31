@@ -287,7 +287,6 @@ if __name__ == "__main__":
     # Print best val_acc and val_loss
     print 'Validation accuracy:', max(history.history['val_acc'])
     print 'Validation loss:', min(history.history['val_loss'])
-    print 'Validation mean square error:', min(history.history['mse'])
     plot_training_info(['accuracy', 'loss'], True, history.history)    
     
     print 'FIN'    
