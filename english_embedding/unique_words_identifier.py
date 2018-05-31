@@ -8,10 +8,11 @@ Created on Mon May 07 14:39:12 2018
 import json
 from unidecode import unidecode
 
-DATASET_IRONY= "./../irony/dataset/irony-labeled-clean.json"
+DATASET_IRONY = "./../irony/dataset/irony-labeled-clean.json"
 DATASET_VALENCE_AROUSAL = "./../valence_arousal/dataset/valence-arousal-clean.json"
+DATASET_POLARITY = "./../polarity/dataset/full-corpus-clean.json"
 
-datasets_json = [DATASET_IRONY, DATASET_VALENCE_AROUSAL]
+datasets_json = [DATASET_IRONY, DATASET_VALENCE_AROUSAL,DATASET_POLARITY]
 
 unique_words = set()
 max_phrase_length = 0
