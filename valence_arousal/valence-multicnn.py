@@ -28,13 +28,13 @@ from sklearn.model_selection import train_test_split
 from unidecode import unidecode
 
 
-DATASET_JSON = "./dataset/valence-arousal-clean.json.json"
+DATASET_JSON = "./dataset/valence-arousal-clean.json"
 WORD2VEC_MODEL = "./../english_embedding/GoogleNews-vectors-negative300.bin"
 UNIQUE_WORDS = "./../english_embedding/unique_words.json"
 TOTAL_TEXT = "./../english_embedding/total_text.txt"
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '08'
+EXPERIMENT_ID = '01'
 # File name for best model weights storage
 WEIGHTS_FILE = EXPERIMENT_ID + '_cnn_parallel_withattention_notime.hdf5'
 
@@ -253,13 +253,13 @@ if __name__ == "__main__":
     embedding_words = Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=INPUT_WORDS, trainable=True, name='embedding_words')(input_words)        
     reshape = Reshape((INPUT_WORDS, WORD_EMBEDDING_LENGTH, 1), name = 'reshape')(embedding_words) 
     #branching convolutions
-    ngram_2 = Convolution2D(50, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_2')(reshape)
+    ngram_2 = Convolution2D(200, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_2')(reshape)
     maxpool_2 = MaxPooling2D(pool_size=(INPUT_WORDS-2+1,1), name = 'pooling_2')(ngram_2)
-    ngram_3 = Convolution2D(50, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_3')(reshape)
+    ngram_3 = Convolution2D(200, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_3')(reshape)
     maxpool_3 = MaxPooling2D(pool_size=(INPUT_WORDS-3+1,1), name = 'pooling_3')(ngram_3)
-    ngram_4 = Convolution2D(50, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_4')(reshape)
+    ngram_4 = Convolution2D(200, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_4')(reshape)
     maxpool_4 = MaxPooling2D(pool_size=(INPUT_WORDS-4+1,1), name = 'pooling_4')(ngram_4)
-    ngram_5 = Convolution2D(50, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
+    ngram_5 = Convolution2D(200, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
     maxpool_5 = MaxPooling2D(pool_size=(INPUT_WORDS-5+1,1), name = 'pooling_5')(ngram_5)
     #1 branch again
     merged = Concatenate(axis=2)([maxpool_2, maxpool_3, maxpool_4, maxpool_5])
@@ -269,9 +269,9 @@ if __name__ == "__main__":
     drop_1 = Dropout(0.8, name = 'drop_1')(dense_1)
     dense_2 = Dense(256, activation = 'relu',name = 'dense_2')(drop_1)
     drop_2 = Dropout(0.8, name = 'drop_2')(dense_2)
-    output_irony = Dense(2, activation='sigmoid', name='main_output')(drop_2)
+    output_irony = Dense(1, activation='sigmoid', name='main_output')(drop_2)
     model = Model(input=[input_words], output=[output_irony])
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
     print 'Model built'
     print(model.summary())
     sys.stdout.flush()
@@ -287,6 +287,7 @@ if __name__ == "__main__":
     # Print best val_acc and val_loss
     print 'Validation accuracy:', max(history.history['val_acc'])
     print 'Validation loss:', min(history.history['val_loss'])
+    print 'Validation mean square error:', min(history.history['mse'])
     plot_training_info(['accuracy', 'loss'], True, history.history)    
     
     print 'FIN'    
