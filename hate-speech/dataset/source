@@ -1,1 +1,13 @@
 https://github.com/ZeerakW/hatespeech/blob/master/NAACL_SRW_2016.csv
+
+@InProceedings{waseem-hovy:2016:N16-2,
+  author    = {Waseem, Zeerak  and  Hovy, Dirk},
+  title     = {Hateful Symbols or Hateful People? Predictive Features for Hate Speech Detection on Twitter},
+  booktitle = {Proceedings of the NAACL Student Research Workshop},
+  month     = {June},
+  year      = {2016},
+  address   = {San Diego, California},
+  publisher = {Association for Computational Linguistics},
+  pages     = {88--93},
+  url       = {http://www.aclweb.org/anthology/N16-2013}
+}
