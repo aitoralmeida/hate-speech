@@ -28,6 +28,8 @@ if __name__ == "__main__":
         print 'Dataset:', dataset_json 
         with open(dataset_json, 'r') as dataset_file:
             rows = json.load(dataset_file)
+        i = 0
+        total = len(rows)
         for row in rows:
             i += 1
             text = row[0]
@@ -37,7 +39,7 @@ if __name__ == "__main__":
             if len(words) > max_phrase_length:
                 max_phrase_length = len(words)
             if i % 1000 == 0:
-                print 'Processing line', i
+                print 'Processed line', i, 'of', total
                     
     print len(unique_words)
     print max_phrase_length  
