@@ -103,7 +103,10 @@ if __name__ == "__main__":
             text = row[1]
             text = clean_text(text)
             label = row[0]
-            rows.append([text, label])
+            if label == '0' or label == '2':
+                rows.append([text, label])
+            else:
+                print label
     print 'Training examples:', len(rows)
 
     with open(DATASET_CLEAN_RM, 'w') as clean:
