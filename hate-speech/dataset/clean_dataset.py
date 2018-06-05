@@ -7,8 +7,11 @@ Created on Tue May 29 10:03:24 2018
 
 import csv, json
 
-DATASET= "labeled_data.csv"
-DATASET_CLEAN = "dataset_clean.json"
+DATASET_DT= "labeled_data.csv"
+DATASET_CLEAN_DT = "dataset_clean_DT.json"
+DATASET_RM= "labeled_data_tweets_only.csv"
+DATASET_CLEAN_RM = "dataset_clean_RM.json"
+
 
 '''
 
@@ -78,8 +81,9 @@ def clean_text(text):
 if __name__ == "__main__":
     print 'starting'
    
+    print 'DT'
     rows = []
-    with open(DATASET, 'r') as csv_file:
+    with open(DATASET_DT, 'r') as csv_file:
         reader = csv.reader(csv_file)         
         for row in reader:
             text = row[6]
@@ -88,7 +92,21 @@ if __name__ == "__main__":
             rows.append([text, label])
     print 'Training examples:', len(rows)
 
-    with open(DATASET_CLEAN, 'w') as clean:
+    with open(DATASET_CLEAN_DT, 'w') as clean:
+        json.dump(rows, clean, indent = 2)
+        
+    print 'RM'    
+    rows = []
+    with open(DATASET_RM, 'r') as csv_file:
+        reader = csv.reader(csv_file)         
+        for row in reader:
+            text = row[1]
+            text = clean_text(text)
+            label = row[0]
+            rows.append([text, label])
+    print 'Training examples:', len(rows)
+
+    with open(DATASET_CLEAN_RM, 'w') as clean:
         json.dump(rows, clean, indent = 2)
     
 #    with open(DATASET_IRONY_CLEAN, 'r') as intermediate:

@@ -12,9 +12,10 @@ DATASET_IRONY = "./../irony/dataset/irony-labeled-clean.json"
 DATASET_VALENCE_AROUSAL = "./../valence_arousal/dataset/valence-arousal-clean.json"
 DATASET_POLARITY = "./../polarity/dataset/full-corpus-clean.json"
 DATASET_EMOTION = "./../emotion/dataset/text_emotion-clean.json"
-DATASET_HATE = "./../hate-speech/dataset/dataset_clean.json"
+DATASET_HATE_DT = "./../hate-speech/dataset/dataset_clean_DT.json"
+DATASET_HATE_RM = "./../hate-speech/dataset/dataset_clean_RM.json"
 
-datasets_json = [DATASET_IRONY, DATASET_VALENCE_AROUSAL, DATASET_POLARITY, DATASET_EMOTION, DATASET_HATE]
+datasets_json = [DATASET_IRONY, DATASET_VALENCE_AROUSAL, DATASET_POLARITY, DATASET_EMOTION, DATASET_HATE_DT, DATASET_HATE_RM]
 
 unique_words = set()
 max_phrase_length = 0
