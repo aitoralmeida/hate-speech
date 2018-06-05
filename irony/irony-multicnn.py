@@ -31,9 +31,10 @@ from unidecode import unidecode
 DATASET_JSON = "./dataset/irony-labeled-clean.json"
 WORD2VEC_MODEL = "./../english_embedding/GoogleNews-vectors-negative300.bin"
 UNIQUE_WORDS = "./../english_embedding/unique_words.json"
+TOTAL_TEXT = "./../english_embedding/total_text.txt"
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '07'
+EXPERIMENT_ID = '08'
 # File name for best model weights storage
 WEIGHTS_FILE = EXPERIMENT_ID + '_cnn_parallel_withattention_notime.hdf5'
 
@@ -107,13 +108,13 @@ Output:
 def prepare_x_y(data, unique_words):
     #recover all the actions in order.
     phrases = get_phrases(data)
-#    print actions.tolist()
-#    print actions.tolist().index('HallBedroomDoor_1')
+    texts = get_total_text()
     # Use tokenizer to generate indices for every action
     # Very important to put lower=False, since the Word2Vec model
     # has the action names with some capital letters
     tokenizer = Tokenizer(lower=True)
-    tokenizer.fit_on_texts(phrases)
+#    tokenizer.fit_on_texts(phrases)
+    tokenizer.fit_on_texts(texts)
     word_index = tokenizer.word_index  
     
     X = []
@@ -167,6 +168,12 @@ def get_labels(data):
     for row in data:
         labels.append(row[1])
     return labels
+    
+def get_total_text():
+    text = ''
+    with open(TOTAL_TEXT, 'r') as total_text:
+        text = total_text.read()
+    return text
     
 """
 Function to create the embedding matrix, which will be used to initialize
@@ -257,25 +264,25 @@ if __name__ == "__main__":
     sys.stdout.flush()
     #input pipeline
     input_words = Input(shape=(INPUT_WORDS,), dtype='int32', name='input_words')
-    embedding_words = Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=INPUT_WORDS, trainable=True, name='embedding_words')(input_words)        
-    reshape = Reshape((INPUT_WORDS, WORD_EMBEDDING_LENGTH, 1), name = 'reshape')(embedding_words) 
+    embedding_words = Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=INPUT_WORDS, trainable=True, name='irony_embedding_words')(input_words)        
+    reshape = Reshape((INPUT_WORDS, WORD_EMBEDDING_LENGTH, 1), name = 'irony_reshape')(embedding_words) 
     #branching convolutions
-    ngram_2 = Convolution2D(100, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_2')(reshape)
-    maxpool_2 = MaxPooling2D(pool_size=(INPUT_WORDS-2+1,1), name = 'pooling_2')(ngram_2)
-    ngram_3 = Convolution2D(100, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_3')(reshape)
-    maxpool_3 = MaxPooling2D(pool_size=(INPUT_WORDS-3+1,1), name = 'pooling_3')(ngram_3)
-    ngram_4 = Convolution2D(100, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_4')(reshape)
-    maxpool_4 = MaxPooling2D(pool_size=(INPUT_WORDS-4+1,1), name = 'pooling_4')(ngram_4)
-    ngram_5 = Convolution2D(100, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
-    maxpool_5 = MaxPooling2D(pool_size=(INPUT_WORDS-5+1,1), name = 'pooling_5')(ngram_5)
+    ngram_2 = Convolution2D(50, 2, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'irony_conv_2')(reshape)
+    maxpool_2 = MaxPooling2D(pool_size=(INPUT_WORDS-2+1,1), name = 'irony_pooling_2')(ngram_2)
+    ngram_3 = Convolution2D(50, 3, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'irony_conv_3')(reshape)
+    maxpool_3 = MaxPooling2D(pool_size=(INPUT_WORDS-3+1,1), name = 'irony_pooling_3')(ngram_3)
+    ngram_4 = Convolution2D(50, 4, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'irony_conv_4')(reshape)
+    maxpool_4 = MaxPooling2D(pool_size=(INPUT_WORDS-4+1,1), name = 'irony_pooling_4')(ngram_4)
+    ngram_5 = Convolution2D(50, 5, WORD_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'irony_conv_5')(reshape)
+    maxpool_5 = MaxPooling2D(pool_size=(INPUT_WORDS-5+1,1), name = 'irony_pooling_5')(ngram_5)
     #1 branch again
     merged = Concatenate(axis=2)([maxpool_2, maxpool_3, maxpool_4, maxpool_5])
-    flatten = Flatten(name = 'flatten')(merged)
+    flatten = Flatten(name = 'irony_flatten')(merged)
 #    batch_norm = BatchNormalization()(flatten)
-    dense_1 = Dense(256, activation = 'relu',name = 'dense_1')(flatten)
-    drop_1 = Dropout(0.8, name = 'drop_1')(dense_1)
-    dense_2 = Dense(256, activation = 'relu',name = 'dense_2')(drop_1)
-    drop_2 = Dropout(0.8, name = 'drop_2')(dense_2)
+    dense_1 = Dense(256, activation = 'relu',name = 'irony_dense_1')(flatten)
+    drop_1 = Dropout(0.8, name = 'irony_drop_1')(dense_1)
+    dense_2 = Dense(256, activation = 'relu',name = 'irony_dense_2')(drop_1)
+    drop_2 = Dropout(0.8, name = 'irony_drop_2')(dense_2)
     output_irony = Dense(2, activation='softmax', name='main_output')(drop_2)
     model = Model(input=[input_words], output=[output_irony])
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
