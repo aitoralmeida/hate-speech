@@ -132,7 +132,7 @@ if __name__ == "__main__":
             if ', "is_quote_status"' in tokens[0]:
                 text = text.split(', "is_quote_status"')[0] 
             text = clean_text(text)
-            label = 1
+            label = '1'
             rows.append([text, label])
             
     with open(DATASET_WZ_L_SEXISM, 'r') as j_file:
@@ -148,7 +148,7 @@ if __name__ == "__main__":
             if ', "is_quote_status"' in tokens[0]:
                 text = text.split(', "is_quote_status"')[0] 
             text = clean_text(text)
-            label = 2
+            label = '2'
             rows.append([text, label])
             
     with open(DATASET_WZ_L_NEITHER, 'r') as j_file:
@@ -163,7 +163,7 @@ if __name__ == "__main__":
             if ', "is_quote_status"' in tokens[0]:
                 text = text.split(', "is_quote_status"')[0] 
             text = clean_text(text)
-            label = 0
+            label = '0'
             rows.append([text, label])           
             
     print 'Training examples:', len(rows)    
