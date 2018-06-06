@@ -11,6 +11,10 @@ DATASET_DT= "labeled_data.csv"
 DATASET_CLEAN_DT = "dataset_clean_DT.json"
 DATASET_RM= "labeled_data_tweets_only.csv"
 DATASET_CLEAN_RM = "dataset_clean_RM.json"
+DATASET_WZ_L_RACISM = "./hs_data/racism.json"
+DATASET_WZ_L_SEXISM = "./hs_data/sexism.json"
+DATASET_WZ_L_NEITHER = "./hs_data/neither.json"
+DATASET_WZ_L = "dataset_clean_WZL.json"
 
 
 '''
@@ -107,9 +111,64 @@ if __name__ == "__main__":
                 rows.append([text, label])
             else:
                 print label
-    print 'Training examples:', len(rows)
-
+    print 'Training examples:', len(rows)    
+    
     with open(DATASET_CLEAN_RM, 'w') as clean:
+        json.dump(rows, clean, indent = 2)
+        
+    print 'WZ_L'
+    rows = []    
+    #I'm not proud of this
+    with open(DATASET_WZ_L_RACISM, 'r') as j_file:
+        for line in j_file:
+            tokens = line.split('"truncated":')
+            tokens = tokens[1].split('"text":')
+            tokens = tokens[1].split(', "created_at":')
+            text = tokens[0]
+            if ', "extended_entities"' in tokens[0]:
+                text = text.split(', "extended_entities"')[0]
+            if ', "place":' in tokens[0]:
+                text = text.split(', "place":')[0]  
+            if ', "is_quote_status"' in tokens[0]:
+                text = text.split(', "is_quote_status"')[0] 
+            text = clean_text(text)
+            label = 1
+            rows.append([text, label])
+            
+    with open(DATASET_WZ_L_SEXISM, 'r') as j_file:
+        for line in j_file:
+            tokens = line.split('"truncated":')
+            tokens = tokens[1].split('"text":')
+            tokens = tokens[1].split(', "created_at":')
+            text = tokens[0]
+            if ', "extended_entities"' in tokens[0]:
+                text = text.split(', "extended_entities"')[0]
+            if ', "place":' in tokens[0]:
+                text = text.split(', "place":')[0]   
+            if ', "is_quote_status"' in tokens[0]:
+                text = text.split(', "is_quote_status"')[0] 
+            text = clean_text(text)
+            label = 2
+            rows.append([text, label])
+            
+    with open(DATASET_WZ_L_NEITHER, 'r') as j_file:
+        for line in j_file:
+            tokens = line.split('"text":')
+            tokens = tokens[1].split(', "coordinates":')
+            text = tokens[0]
+            if ', "extended_entities"' in tokens[0]:
+                text = text.split(', "extended_entities"')[0]
+            if ', "place":' in tokens[0]:
+                text = text.split(', "place":')[0]   
+            if ', "is_quote_status"' in tokens[0]:
+                text = text.split(', "is_quote_status"')[0] 
+            text = clean_text(text)
+            label = 0
+            rows.append([text, label])           
+            
+    print 'Training examples:', len(rows)    
+    
+    with open(DATASET_WZ_L, 'w') as clean:
         json.dump(rows, clean, indent = 2)
     
 #    with open(DATASET_IRONY_CLEAN, 'r') as intermediate:
