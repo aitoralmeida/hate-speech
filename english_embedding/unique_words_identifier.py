@@ -53,13 +53,13 @@ if __name__ == "__main__":
                     print len(accum_text)
                     print 'Writing File'
                     outfile.write(unidecode(accum_text))
-                    text = ' '
+                    accum_text = ' '
             sys.stdout.flush()
         with open('total_text.txt', 'a') as outfile:
             print len(accum_text)
             print 'Writing File'
             outfile.write(unidecode(accum_text))
-            text = ' '
+            accum_text = ' '
             sys.stdout.flush()
                 
                     
