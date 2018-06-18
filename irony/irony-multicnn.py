@@ -114,7 +114,7 @@ def prepare_x_y(data, unique_words):
     # has the action names with some capital letters
     tokenizer = Tokenizer(lower=True)
 #    tokenizer.fit_on_texts(phrases)
-    tokenizer.fit_on_texts(texts)
+    tokenizer.fit_on_texts([texts])
     word_index = tokenizer.word_index  
     
     X = []
@@ -199,7 +199,9 @@ def create_embedding_matrix(tokenizer):
                 unknown_words[word] += 1
             else:
                 unknown_words[word] = 1
+    print 'Total tokens:', len(word_index)
     print "Number of unknown tokens: " + str(len(unknown_words))
+    print embedding_matrix.shape
    
     return embedding_matrix
 
